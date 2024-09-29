@@ -1,26 +1,40 @@
 use colored::*;
+use crossterm::execute;
 use rayon::prelude::*;
 use std::collections::HashMap;
+use std::io::{self};
 use std::path::{Path, PathBuf};
 use std::{env, fs};
-use walkdir::WalkDir; // For parallel iterators
+use walkdir::WalkDir;
 
 fn main() {
+    // Enable ANSI support for Windows terminals
+    if cfg!(target_os = "windows") {
+        let _ = execute!(
+            io::stdout(),
+            crossterm::terminal::Clear(crossterm::terminal::ClearType::All)
+        );
+    }
+
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
-        eprintln!("{}", "Usage: file_organizer <directory>".red());
+        eprintln!("Usage: file_organizer <directory>");
         return;
     }
 
     let directory = &args[1];
+
+    // Notify user that files are being organized
     println!("{}", "Organizing files...".blue());
 
     if let Err(e) = organize_files(directory) {
-        eprintln!("Error organizing files: {}", e.to_string().red());
+        eprintln!("{}", e.to_string().red()); // Convert the error to string before coloring
     } else {
-        println!("{}", "Files organized successfully!".green());
+        println!("{} {}", directory, "organized successfully!".green());
     }
 }
+
+// Ensure the rest of your code remains unchanged
 
 fn get_file_type_mapping() -> HashMap<&'static str, &'static str> {
     let mut file_types = HashMap::new();
