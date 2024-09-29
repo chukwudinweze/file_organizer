@@ -1,3 +1,4 @@
+use colored::*;
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -7,16 +8,17 @@ use walkdir::WalkDir; // For parallel iterators
 fn main() {
     let args: Vec<String> = env::args().collect();
     if args.len() != 2 {
-        eprintln!("Usage: file_organizer <directory>");
+        eprintln!("{}", "Usage: file_organizer <directory>".red());
         return;
     }
 
     let directory = &args[1];
+    println!("{}", "Organizing files...".blue());
 
     if let Err(e) = organize_files(directory) {
-        eprintln!("Error organizing files: {}", e);
+        eprintln!("Error organizing files: {}", e.to_string().red());
     } else {
-        println!("Files organized successfully!");
+        println!("{}", "Files organized successfully!".green());
     }
 }
 
